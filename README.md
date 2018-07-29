@@ -1,31 +1,36 @@
-# To Do List
+# Todo List
 - [ ] Scala Basics
-- [ ] RDD
-- [ ] Accumulators
-- [ ] Broadcast Var
-- [ ] Data Frames
-- [ ] Data Sets
-- [ ] Sql
-- [ ] Machine Learning - Basics
-- [ ] Machine Learning - Pipeline
-- [ ] Machine Learning - Pre-Processing
-- [ ] Machine Learning - Regression
-- [ ] Machine Learning - Classification
-- [ ] Machine Learning - Clustering
-- [ ] Machine Learning - Collaborative filtering
-- [ ] Machine Learning - Frequent pattern mining
-- [ ] Machine Learning - Model selection & tunning
-- [ ] Machine Learning - Advanced topics
-- [ ] Machine Learning - Data types
-- [ ] Machine Learning - Basic Statistics
-- [ ] Machine Learning - Dimension Reduction
-- [ ] Machine Learning - Evaluation metrics
-- [ ] Machine Learning - PMML model export
-- [ ] Structure Streaming Basics - 1
-- [ ] Structure Streaming Basics - 2
-- [ ] Structure Streaming Basics - 3
-- [ ] Spark Streaming - Basic concepts 1
-- [ ] Spark Streaming - Basic concepts 2
-- [ ] Spark Streaming - Performance tuning
-- [ ] Graphx Basics
-- [ ] Graphx Algorithms
+  - [ ] Spark core concepts
+  - [ ] RDD
+  - [ ] Accumulators
+  - [ ] Broadcast Var
+  - [ ] Data Frames
+  - [ ] Data Sets
+  - [ ] Sql
+- [ ] Machine Learning
+  - [ ] Basics
+  - [ ] Pipeline
+  - [ ] Pre-Processing
+  - [ ] Regression
+  - [ ] Classification
+  - [ ] Clustering
+  - [ ] Collaborative filtering
+  - [ ] Frequent pattern mining
+  - [ ] Model selection & tunning
+  - [ ] Advanced topics
+  - [ ] Data types
+  - [ ] Basic Statistics
+  - [ ] Dimension Reduction
+  - [ ] Evaluation metrics
+  - [ ] PMML model export
+- [ ] Structure Streaming Basics
+  - [ ] Part 1
+  - [ ] Part 2
+  - [ ] Part 3
+- [ ] Spark Streaming
+  - [ ] Basic concepts part 1
+  - [ ] Basic concepts part 2
+  - [ ] Performance tuning
+- [ ] Graphx
+  - [ ] Basics
+  - [ ] Algorithms
