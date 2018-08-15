@@ -162,3 +162,26 @@ go to step 1
     * if join column on right side is “larger" than join column on left side:
 get next row from left side (if there are no more rows, finish processing)
 go to step 1
+## [Postgres Query Plan - Part 4](https://www.depesz.com/2013/05/09/explaining-the-unexplainable-part-4/)
+* **Unique**:
+    * DISTINCT
+    * Query will usually be done using HashAggregate.
+    * The problem with Unique is that is requires data to be sorted. Not because it needs data in any particular order – but it needs it so that all rows with the same value will be “together".
+    * This makes it really cool (when possible to use) because it doesn't use virtually any memory. It just checks if value in previous row is the same as in current, and if yes – discards it. That's all.
+    * **Always sort before Unique**
+* **Append**:
+    * UNION/UNION All
+    * UNION ALL - run all plans and results push together
+    * UNION - to remove duplicate, it uses HashAggregate
+* **HashSetOp**:
+    * INTERSECT/EXCEPT
+* **GroupAggregate**
+    * To work data has to be sorted using whatever column(s) you used for your GROUP BY clause.
+* **CTE Scan**:
+    * It runs a part of a query, and stores output so that it can be used by other part (or parts) of the query
+    * --- CTEs are ran just as specified. So they can be used to circumvent  **some not-so-good optimizations that planner normally can do**.
+* **InitPlan**:
+    * Initial part of query to execute, which don't have depend on other query parts
+* **SubPlan**:
+    * SubPlan is called to calculate data from a subquery, that actually does depends on current row.
+
