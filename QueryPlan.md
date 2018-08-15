@@ -184,4 +184,29 @@ go to step 1
     * Initial part of query to execute, which don't have depend on other query parts
 * **SubPlan**:
     * SubPlan is called to calculate data from a subquery, that actually does depends on current row.
-
+## [Postgres Query Plan - Part 5](https://www.depesz.com/2013/05/30/explaining-the-unexplainable-part-5/)
+* If all rows in have the same some_value – then using (potentially existing) index on column doesn't make sense.
+* if column is unique (or almost unique) – usage of index is really good idea.
+```sql 
+select * from pg_stats where tablename = 'tablename';
+```
+* **null_frac**: 
+    * How many rows contains null value in given column. This is a fraction, so it's value from 0 to 1
+* **avg_width**:
+    * Average width of data in this column. 
+    * Interesting when we use different data types.
+* **n_distinct** : 
+    * Positive means closer to 1 ( if all have same value )
+    * Negative means most of them are unique
+* **most_common_vals** :
+    * most common values
+* **most_common_freqs** :
+    * Fraction of most common values in table
+* **histogram_bounds** :
+    * array of values which divide whole recordset into groups of the same number of rows
+* **correlation** :
+    * This is interesting statistic
+    * it shows whether there is correlation between physical row ordering on disk, and values. This can go from -1 to 1
+    * Generally the closer it is to -1/1 – the more correlation there is.
+    * High correlation is best for queries
+* most_common_elems, most_common_elem_freqs and elem_count_histogram are like most_common_vals, most_common_freqs and histogram_bounds but for non-scalar datatypes 
