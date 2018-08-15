@@ -104,3 +104,61 @@ explain analyze select * from pg_class where relname ~ 'a';
         Total runtime: 4.765 ms
         (8 rows)
 
+## [Postgres Query Plan - Part 3](https://www.depesz.com/2013/05/09/explaining-the-unexplainable-part-3/)
+* **Function Scan**:
+    ```sql
+    explain analyze select * from generate_Series(1,10) i where i < 3;
+    ------------------------------------------------------------------------------------------------------------------
+    Function Scan on generate_series i  (cost=0.00..12.50 rows=333 width=4) (actual time=0.012..0.014 rows=2 loops=1)
+        Filter: (i < 3)
+        Rows Removed by Filter: 8
+    Total runtime: 0.030 ms
+    (4 rows)
+    ```
+    * Return multiple rows or multiple columns
+* **Sort Scan**:
+    ```sql
+    explain analyze select * from pg_class order by relname;
+    ---------------------------------------------------------------------------------------------------------------
+    Sort  (cost=22.88..23.61 rows=292 width=203) (actual time=0.230..0.253 rows=295 loops=1)
+    Sort Key: relname
+    Sort Method: quicksort  Memory: 103kB
+    ->  Seq Scan on pg_class  (cost=0.00..10.92 rows=292 width=203) (actual time=0.007..0.048 rows=295 loops=1)
+    Total runtime: 0.326 ms
+    (5 rows)
+    ```
+    * Sort all records then push first record to client or parent
+    * if memory used for sorting would be more than **work_mem**, it will switch to using disk based sorting
+        * Sort Method: quicksort, if fit in memory
+        * Sort Method: external merge, if not able to fit in memory
+        * Sort Method: top-N heapsort, if LIMIT used with order by
+* **Limit**:
+    * Will stop the sub-operation when it reach the limit
+* **HashAggregate**:
+    * Sum, Avg, Min, Max, other aggregate functions with Group By
+    * HashAggregate does something like this: for every row it gets, it finds GROUP BY “key" (in this case relkind). Then, in hash (associative array, dictionary), puts given row into bucket designated by given key.
+    * After all rows have been processed, it scans the hash, and returns single row per each key value, when necessary – doing appropriate calculations (sum, min, avg, and so on).
+    * It is important to understand that HashAggregate has to scan all rows before it can return even single row.
+    * If plan have both Sort & Aggregate function then it need **2*work_mem**
+    * Single query can use many times work_mem, as work_mem is a limit per operation
+* **Hash Join / Hash**:
+    * It has two sub operations. One of them is always *Hash*, and the other is something else
+    * First (the one called by Hash) has to return all rows, which have to be stored in hash, and the other is processed one row at a time, and some rows will get skipped if they don't exist in hash from the other side
+    * will use up to work_mem of memory
+* **Nested Loop**:
+    * Nested Loop runs one side of join, once. Let's name it “A".
+    * For every row in “A", it runs second operation (let's name it “B")
+    * if “B" didn't return any rows – data from “A" is ignored
+    * if “B" did return rows, for every row it returned, new row is returned by Nested Loop, based on current row from A, and current row from B
+    * --- There is no Nested Loop Right Join, because Nested Loop always starts with left side as basis to looping. So join that uses RIGHT JOIN, that would use Nested Loop, will get internally transformed to LEFT JOIN so that Nested Loop can work.
+* **Merge Join**:
+    * if join column on right side is the same as join column on left side:
+return new joined row, based on current rows on the right and left sides
+get next row from right side (or, if there are no more rows, on left side)
+go to step 1
+    * if join column on right side is “smaller" than join column on left side:
+get next row from right side (if there are no more rows, finish processing)
+go to step 1
+    * if join column on right side is “larger" than join column on left side:
+get next row from left side (if there are no more rows, finish processing)
+go to step 1
