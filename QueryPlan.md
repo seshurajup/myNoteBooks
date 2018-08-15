@@ -55,3 +55,52 @@ cpu_tuple_cost = 0.01                  # same scale as above
 cpu_index_tuple_cost = 0.005           # same scale as above
 cpu_operator_cost = 0.0025             # same scale as above
 ```
+
+## [Postgres Query Plan - Part 2](https://www.depesz.com/2013/04/27/explaining-the-unexplainable-part-2/)
+```sql
+explain analyze select * from pg_class where relname ~ 'a';  
+---------------------------------------------------------------------------------------------------------
+ Seq Scan on pg_class  (cost=0.00..11.65 rows=227 width=202) (actual time=0.030..0.294 rows=229 loops=1)
+   Filter: (relname ~ 'a'::text)
+   Rows Removed by Filter: 66
+ Total runtime: 0.379 ms
+(4 rows)
+```
+* **Seq Scan**:
+    * Reads rows, one by one, returning them to user or to upper node
+    * Order of returned rows is not any specific
+    * *Filter rows* – that is reject some from being returned
+    * --- : Sequential scan is faster for getting single page, but on the other hand – you not always need all the pages.
+* **Index Scan**:
+    * opens the index
+    * in the index if finds where (in table data) there might be rows that match given condition
+    * opens table
+    * fetches row(s) pointed to by index
+    * if the rows can be returned – i.e. they are visible to current session – they are returned
+    * rows which deleted are invisible state in table until vacuumed
+    * **Index scan - used when you want some data ordered using order from index**
+    * **Index Scan Backward** - used when use order by desc 
+    * **Index only Scan** 
+        *  Pg realized that I select only data (columns) that are in the index. And it is possible that it doesn't need to check anything in the table files. So that it will return the data straight from index
+        *  **Super Fast**
+        *  The problem is that, in order to make it work, Index has to contain information that given rows are in pages, that didn't have any changes “recently". This means that in order to utilize Index Only Scans, you have to have your table well vacuumed. But with *autovacuum* running, it shouldn't be that big of a deal.
+    * --- : Index Scans (normal) cause random IO – that is, pages from disk are loaded in random fashion. Which, at least on spinning disks, is slow.
+* **Bitmap Scan**:
+    * Bitmap Scans are always in (at least) two nodes. First (lower level) there is Bitmap Index Scan, and then there is Bitmap Heap Scan
+  
+    * Let's assume your table has 100000 pages (that would be ~ 780MB). Bitmap Index Scan would create a bitmap where there would be one bit for every page in your table. So in this case, we'd get memory block of 100,000 bits ~ 12.5kB. All these bits would be set to 0. Then Bitmap Index Scan, would set some bits to 1, depending on which page in table might contain row that should be returned.
+    * This part doesn't touch table data at all. Just index. After it will be done – that is all pages that might contain row that should be returned will be “marked", this bitmap is passed to upper node – Bitmap Heap Scan, which reads them in more sequential fashion
+    * --- : when the rows that you'll be returning are not in single block (which would be the case if I did “… where id < ..."). Bitmap scans have also one more interesting feature. That is - they can join two operations, two indexes ( a < 5 & a > 10 )
+    * ```sql
+         explain analyze select * from test where i < 5000000 or i > 950000000;
+         ------------------------------------------------------------------------------------------------------------------------
+        Bitmap Heap Scan on test  (cost=107.36..630.60 rows=5323 width=8) (actual time=1.023..4.353 rows=5386 loops=1)
+            Recheck Cond: ((i < 5000000) OR (i > 950000000))
+        ->  BitmapOr  (cost=107.36..107.36 rows=5349 width=0) (actual time=0.922..0.922 rows=0 loops=1)
+            ->  Bitmap Index Scan on i1  (cost=0.00..12.25 rows=527 width=0) (actual time=0.120..0.120 rows=491 loops=1)
+               Index Cond: (i < 5000000)
+            ->  Bitmap Index Scan on i1  (cost=0.00..92.46 rows=4822 width=0) (actual time=0.799..0.799 rows=4895 loops=1)
+               Index Cond: (i > 950000000)
+        Total runtime: 4.765 ms
+        (8 rows)
+
