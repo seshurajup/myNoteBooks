@@ -274,4 +274,5 @@ select * from pg_stats where tablename = 'tablename';
     * **SET trace_sort TO on**
     * **SET client_min_messages TO log**
     * **EXPLAIN (ANALYZE, VERBOSE, COSTS, BUFFERS, TIMING, SUMMARY, FORMAT JSON)**
-    *[Estimating Needed Memory for a Sort](https://rjuju.github.io/postgresql/2015/08/18/estimating-needed-memory-for-a-sort.html)
+    
+##[Estimating Needed Memory for a Sort](https://rjuju.github.io/postgresql/2015/08/18/estimating-needed-memory-for-a-sort.html)
