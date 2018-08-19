@@ -280,6 +280,7 @@ select * from pg_stats where tablename = 'tablename';
     * SET enable_seqscan = OFF;
     * SET max_parallel_workers = total cores;
     * SET max_parallel_workers_per_gather = 1/3 of total cores;
+    * SET default_statistics_target = 100-10000
     * Extra set parameters from **[Query planning - server configuration](https://www.postgresql.org/docs/10/static/runtime-config-query.html)**
     * EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON) 
     * SELECT * FROM (VALUES (1), (2) ) as temp_table(column_name)
