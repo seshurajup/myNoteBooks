@@ -293,5 +293,9 @@ select * from pg_stats where tablename = 'tablename';
         * SELECT * FROM pg_stats WHERE schemaname = 'schemaname' AND tablename = 'tablename' AND attname = 'columnname';
         * Postgres's planner used these statistics to select the appropriate index, join methods for query.
     
-##[Estimating Needed Memory for a Sort](https://rjuju.github.io/postgresql/2015/08/18/estimating-needed-memory-for-a-sort.html)
+## [Estimating Needed Memory for a Sort](https://rjuju.github.io/postgresql/2015/08/18/estimating-needed-memory-for-a-sort.html)
 * Best work_memory for existing quries
+
+### [Most of Server Tuning parameters in V10](https://github.com/jberkus/annotated.conf/blob/master/annotated.csv)
+### [Extra Tuning parameters specific in V10](https://github.com/jberkus/annotated.conf/blob/master/extra.10.conf)
+### [Github -annotated.conf](https://github.com/jberkus/annotated.conf)
