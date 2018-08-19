@@ -269,19 +269,23 @@ select * from pg_stats where tablename = 'tablename';
     * SELECT calls, query FROM pg_stat_statements LIMIT 1;
 * Tools
     * https://postgresqlco.nf
-    * 
+    * https://pgtune.leopard.in.ua/
+    * https://postgresqlco.nf/en/doc/param/
+
 * important tracking parameters
     * **SET trace_sort TO on**
     * **SET client_min_messages TO log**
     * **Pg Stat Statements** :
-        * CREATE EXTENSION pg_stat_statements**
+        * CREATE EXTENSION pg_stat_statements
         * select * from pg_stat_statements order by total_time desc
     * SET enable_nestloop = OFF; 
     * SET enable_seqscan = OFF;
     * SET max_parallel_workers = total cores;
     * SET max_parallel_workers_per_gather = 1/3 of total cores;
     * SET default_statistics_target = 100-10000
-    * Extra set parameters from **[Query planning - server configuration](https://www.postgresql.org/docs/10/static/runtime-config-query.html)**
+    * Extra set parameters from 
+        * **[Query Planning - Server Configuration](https://www.postgresql.org/docs/10/static/runtime-config-query.html)**
+        * **[All Tuning Parameters with Recommendations](https://postgresqlco.nf/en/doc/param/enable_nestloop)**
     * EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON) 
     * SELECT * FROM (VALUES (1), (2) ) as temp_table(column_name)
     * **EXPLAIN (ANALYZE, VERBOSE, COSTS, BUFFERS, TIMING, SUMMARY, FORMAT JSON)**
